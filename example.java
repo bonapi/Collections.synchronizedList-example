@@ -48,7 +48,7 @@ public class Main {
 public class Main {
   public static void main(String[] args) {
 
-    //List<Object> list = new LinkedList<>();
+    		//List<Object> list = new LinkedList<>();
 		List<Object> list = Collections.synchronizedList(new LinkedList<>());
 
 		Thread t1 = new Thread(new Runnable() {
@@ -97,7 +97,7 @@ public class Main {
 public class Main {
   public static void main(String[] args) {
 
-    //List<Object> list = new LinkedList<>();
+    		//List<Object> list = new LinkedList<>();
 		List<Object> list = Collections.synchronizedList(new LinkedList<>());
 
 		Thread t1 = new Thread(new Runnable() {
@@ -105,11 +105,11 @@ public class Main {
 			@Override
 			public void run() {
 
-        synchronized (list) {
-          for (int i = 0; i < 20; i++) {
-            list.add(1);
-          }
-        }
+				synchronized (list) {
+					for (int i = 0; i < 20; i++) {
+						list.add(1);
+					}
+				}
 
 			}
 		});
@@ -120,9 +120,9 @@ public class Main {
 			public void run() {
 
 				synchronized (list) {
-				  for (int i = 0; i < 20; i++) {
+					for (int i = 0; i < 20; i++) {
 						list.add(2);
-				  }
+					}
 				}
 
 			}
@@ -150,7 +150,7 @@ public class Main {
 public class Main {
   public static void main(String[] args) {
 
-    //List<Object> list = new LinkedList<>();
+    		//List<Object> list = new LinkedList<>();
 		List<Object> list = Collections.synchronizedList(new LinkedList<>());
 
 		Thread t1 = new Thread(new Runnable() {
@@ -158,11 +158,11 @@ public class Main {
 			@Override
 			public void run() {
 
-        //synchronized (list) {
-          for (int i = 0; i < 20; i++) {
-            list.add(1);
-          }
-        //}
+				//synchronized (list) {
+					  for (int i = 0; i < 20; i++) {
+						list.add(1);
+					  }
+				//}
 
 			}
 		});
@@ -173,9 +173,9 @@ public class Main {
 			public void run() {
 
 				synchronized (list) {
-				  for (int i = 0; i < 20; i++) {
+					for (int i = 0; i < 20; i++) {
 						list.add(2);
-				  }
+					}
 				}
 
 			}
@@ -194,9 +194,125 @@ public class Main {
     
   }
 }
-
 //output:
 [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 //or
 [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 //or similar where all 2's are combined
+//this behavior may be desired in some circumstances
+
+//you may think that putting System.out.print(line 193) into the synchronized block would be a good idea
+//because there too the list is accessed and you would be correct
+
+public class Main {
+  public static void main(String[] args) {
+
+    		//List<Object> list = new LinkedList<>();
+		List<Object> list = Collections.synchronizedList(new LinkedList<>());
+
+		Thread t1 = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				//synchronized (list) {
+					  for (int i = 0; i < 20; i++) {
+						list.add(1);
+					  }
+				//}
+
+			}
+		});
+
+		Thread t2 = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				synchronized (list) {
+					for (int i = 0; i < 20; i++) {
+						list.add(2);
+					}
+				}
+
+			}
+		});
+
+		t1.start();
+		t2.start();
+
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		synchronized (list) {
+			System.out.print(list);
+		}
+    
+  }
+}
+//output:
+[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+//or
+[1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+//or similar where all 2's are combined
+
+//that leaves only one issue, what happens if we remove Thread.sleep(1000);(line 188)
+//answer is that there will be no error however only part of the list that was filled up to that point will be printed
+
+public class Main {
+  public static void main(String[] args) {
+
+    		//List<Object> list = new LinkedList<>();
+		List<Object> list = Collections.synchronizedList(new LinkedList<>());
+
+		Thread t1 = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				//synchronized (list) {
+					  for (int i = 0; i < 20; i++) {
+						list.add(1);
+					  }
+				//}
+
+			}
+		});
+
+		Thread t2 = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				synchronized (list) {
+					for (int i = 0; i < 20; i++) {
+						list.add(2);
+					}
+				}
+
+			}
+		});
+
+		t1.start();
+		t2.start();
+
+		//try {
+		//	Thread.sleep(1000);
+		//} catch (InterruptedException e) {
+		//	e.printStackTrace();
+		//}
+
+		synchronized (list) {
+			System.out.print(list);
+		}
+    
+  }
+}
+//output:
+[]
+
+//this is happening bacause synchronized blocks of t2 and main threads are raceing to get access to the list
+//and most often main thread is the winner so list is printed before any elements are added
